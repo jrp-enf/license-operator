@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- api_v1_license.yaml
+- core_v1_pod.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
