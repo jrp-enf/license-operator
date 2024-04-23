@@ -41,9 +41,9 @@ type LicenseStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// The number of licenses we believe are still available
-	Available int `json:"available,omitempty"`
+	Available int `json:"available"`
 	// The number of licenses we believe are available after accounting for External InUseLicenseCount
-	RealAvailable int `json:"real_available,omitempty"`
+	RealAvailable int `json:"real_available"`
 	// The list of pods that are using licenses, and how many, in the format ns::name::count
 	UsedBy  []string `json:"used_by,omitempty"`
 	Queuing []string `json:"queuing,omitempty"`

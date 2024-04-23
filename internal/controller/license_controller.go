@@ -90,7 +90,7 @@ func (r *LicenseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 						continue
 					}
 					if len(val) != 1 && len(val) != 2 {
-						l.Error(fmt.Errorf("failed to get license on pod %s::%s, %s", pod.Namespace, pod.Name, val), "license should be : separated from count")
+						l.Error(fmt.Errorf("failed to get license on pod %s::%s, %s", pod.Namespace, pod.Name, val), "license should be / separated from count")
 					}
 					if len(val) == 2 {
 						count, err = strconv.Atoi(val[1])
@@ -119,12 +119,33 @@ func (r *LicenseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if thisLicense.Spec.InUseLicenseCount > used {
 		thisLicense.Status.RealAvailable = thisLicense.Spec.LicenseCount - thisLicense.Spec.InUseLicenseCount
 	}
+	queued = deleteMissing(queued, podList.Items)
 	thisLicense.Status.Queuing = queued
 	err = r.Status().Update(ctx, thisLicense)
 	if err != nil {
 		l.Error(err, "failed to update license status")
 	}
 	return ctrl.Result{RequeueAfter: 60 * time.Second}, nil
+}
+
+func deleteMissing(queued []string, pods []corev1.Pod) []string {
+	var tmpQueued []string
+	for _, q := range queued {
+		v1 := strings.Split(q, "/")
+		v := strings.Split(v1[0], "::")
+		namespace := v[0]
+		podname := v[1]
+		bFound := false
+		for _, p := range pods {
+			if p.Namespace == namespace && p.Name == podname && p.Status.Phase != "Running" {
+				bFound = true
+			}
+		}
+		if bFound {
+			tmpQueued = append(tmpQueued, q)
+		}
+	}
+	return tmpQueued
 }
 
 func PodStatusEntry(namespace, name string, count int) string {

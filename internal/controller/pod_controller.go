@@ -80,13 +80,13 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 				usage := 1
 				val := strings.Split(lic, "/")
 				if len(val) != 1 && len(val) != 2 {
-					l.Error(errors.New("unable to parse license for pod"), "namespace", req.Namespace, "name", req.Name, "license", lic)
+					l.Error(errors.New("unable to parse license for pod"), "parse license", "namespace", req.Namespace, "name", req.Name, "license", lic)
 					continue
 				}
 				if len(val) == 2 {
 					u, err := strconv.Atoi(val[1])
 					if err != nil {
-						l.Error(errors.New("unable to parse license for pod"), "namespace", req.Namespace, "name", req.Name, "license", lic)
+						l.Error(err, "unable to parse license for pod", "namespace", req.Namespace, "name", req.Name, "license", lic)
 						continue
 					}
 					usage = u
@@ -94,7 +94,7 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 				myLicense := &apiv1.License{}
 
 				if err := r.Get(ctx, client.ObjectKey{Namespace: "default", Name: val[0]}, myLicense); err != nil {
-					l.Error(errors.New("unable to retrieve license for pod"), "namespace", req.Namespace, "name", req.Name, "license", val[0])
+					l.Error(err, "unable to retrieve a license for pod", "namespace", req.Namespace, "name", req.Name, "license", val[0])
 					continue
 				}
 				thisPodStatusEntry := PodStatusEntry(thisPod.Namespace, thisPod.Name, usage)
@@ -124,6 +124,7 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 					if bIsBeingDeleted {
 						usage = 0 - usage
 						myLicense.Status.UsedBy = append(myLicense.Status.UsedBy, PodStatusEntry(thisPod.Namespace, thisPod.Name, usage))
+						usage = 0 // leaving usage negative here ends up with restoring too many licenses for some reason
 						var entries []string
 						for _, v := range myLicense.Status.Queuing {
 							if thisPodStatusEntry != v {
