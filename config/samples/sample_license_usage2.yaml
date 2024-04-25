@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    enfabrica.net/license: license-sample/1
+  creationTimestamp: null
+  labels:
+    run: nginx2
+  name: nginx2
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  

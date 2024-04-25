@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    enfabrica.net/license: xx/asdf
+  creationTimestamp: null
+  labels:
+    run: nginx
+  name: nginxbroken
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  

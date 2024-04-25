@@ -1,0 +1,14 @@
+apiVersion: api.license-operator.enfabrica.net/v1
+kind: License
+metadata:
+  labels:
+    app.kubernetes.io/name: license
+    app.kubernetes.io/instance: license-sample2
+    app.kubernetes.io/part-of: license-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: license-operator
+  name: license-sample2
+spec:
+  license_count: 10
+  #inuse_license_count: 0   # Optional, subtract inuse from count + status.inuse to get the real count, for automated tools that update the licenses in use.
+
